@@ -108,6 +108,11 @@
             <input id="discount" type="number" inputmode="decimal" min="0" step="any" placeholder="0">
           </div>
           <div class="totals-row grand"><span>Total</span><span id="grandTotal">0.00</span></div>
+          <div class="totals-row">
+            <span>Cash received</span>
+            <input id="cashIn" type="number" inputmode="decimal" min="0" step="any" placeholder="0">
+          </div>
+          <div class="totals-row hidden" id="changeRow"><span>Change</span><span id="changeAmt">0.00</span></div>
         </div>
       </div>
     </section>
@@ -121,6 +126,7 @@
           <span id="todayTotal" class="grand" style="font-size:16px;font-weight:700"></span>
         </div>
         <div id="soldToday" class="sold-list"></div>
+        <div id="billsToday" class="bills-list"></div>
         <div class="btn-row">
           <button id="stockReportBtn" class="btn btn-secondary btn-sm" type="button">Stock summary</button>
           <button id="dayReportBtn" class="btn btn-secondary btn-sm" type="button">Day report</button>

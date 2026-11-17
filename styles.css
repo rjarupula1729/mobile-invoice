@@ -304,6 +304,33 @@ input:focus, select:focus {
 .sold-row .q { color: var(--muted); }
 .sold-row .a { font-weight: 600; }
 
+/* ---------- today's bills (tap to reopen) ---------- */
+
+.bills-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+.bill-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: 8px;
+  align-items: center;
+  padding: 5px 0;
+  font-size: 13px;
+  border-bottom: 1px dashed var(--border);
+  cursor: pointer;
+}
+
+.bill-row:last-child { border-bottom: none; }
+.bill-row:active { background: #eef7f0; }
+.bill-row .t { color: var(--muted); font-size: 12px; }
+.bill-row .a { font-weight: 600; }
+
+.neg { color: var(--danger); font-weight: 700; }
+
 /* ---------- review modal ---------- */
 
 .review-modal {

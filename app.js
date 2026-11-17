@@ -1,6 +1,6 @@
 'use strict';
 
-const APP_VERSION = 'v13';
+const APP_VERSION = 'v1.0';
 
 const $ = (id) => document.getElementById(id);
 
@@ -14,7 +14,7 @@ const VEGETABLES = [
 
 const LS = {
   settings: 'ci_settings', draft: 'ci_draft', counter: 'ci_counter',
-  customVeg: 'ci_custom_veg', sales: 'ci_sales'
+  customVeg: 'ci_custom_veg', sales: 'ci_sales', rates: 'ci_rates'
 };
 
 let settings = { shopName: '', shopAddress: '', shopPhone: '', currency: 'Rs' };
@@ -23,6 +23,8 @@ let invoiceCounter = 1;
 let customVeg = [];
 let sales = []; // completed bills: {no, iso, time, cust, items, subtotal, discount, total}
 let billRecorded = false; // current bill already logged to today's sales
+let vegRates = {}; // last billed {rate, unit} per item name (lowercase key)
+let previewData = null; // invoice data currently shown in the review modal
 
 /* ---------- persistence ---------- */
 
@@ -32,7 +34,8 @@ function saveAll() {
     items,
     custName: $('custName').value,
     custPhone: $('custPhone').value,
-    discount: $('discount').value
+    discount: $('discount').value,
+    cash: $('cashIn').value
   }));
 }
 
@@ -54,12 +57,17 @@ function loadAll() {
     }
   } catch (e) {}
   try {
+    const r = JSON.parse(localStorage.getItem(LS.rates));
+    if (r && typeof r === 'object') vegRates = r;
+  } catch (e) {}
+  try {
     const d = JSON.parse(localStorage.getItem(LS.draft));
     if (d) {
       items = Array.isArray(d.items) ? d.items : [];
       $('custName').value = d.custName || '';
       $('custPhone').value = d.custPhone || '';
       $('discount').value = d.discount || '';
+      $('cashIn').value = d.cash || '';
     }
   } catch (e) {}
 }
@@ -177,8 +185,16 @@ function renderTotals() {
     if (el) el.textContent = amt.toFixed(2);
   });
   const disc = num($('discount').value);
+  const total = Math.max(0, sub - disc);
   $('subtotal').textContent = money(sub);
-  $('grandTotal').textContent = money(Math.max(0, sub - disc));
+  $('grandTotal').textContent = money(total);
+  const hasCash = $('cashIn').value.trim() !== '';
+  $('changeRow').classList.toggle('hidden', !hasCash);
+  if (hasCash) {
+    const ch = num($('cashIn').value) - total;
+    $('changeAmt').textContent = money(ch);
+    $('changeAmt').classList.toggle('neg', ch < 0);
+  }
 }
 
 /* ---------- item entry ---------- */
@@ -200,6 +216,14 @@ function allVeg() {
   return VEGETABLES.concat(customVeg);
 }
 
+// fill rate + unit from the last bill that sold this item
+function prefillRate(name) {
+  const r = vegRates[String(name).trim().toLowerCase()];
+  if (!r) return;
+  if (r.unit) $('itemUnit').value = r.unit;
+  if (r.rate != null) $('itemRate').value = r.rate;
+}
+
 function buildQuickItems() {
   const wrap = $('quickItems');
   const dl = $('vegList');
@@ -213,6 +237,7 @@ function buildQuickItems() {
     chip.textContent = v;
     chip.addEventListener('click', () => {
       $('itemName').value = v;
+      prefillRate(v);
       $('itemQty').focus();
     });
     if (isCustom) {
@@ -260,8 +285,10 @@ function invoiceData() {
     no: $('invoiceNo').value.trim() || String(invoiceCounter),
     date: fmtDate($('invoiceDate').value || new Date().toISOString().slice(0, 10)),
     custName: $('custName').value.trim(),
+    custPhone: $('custPhone').value.trim(),
     items,
     discount: num($('discount').value),
+    cash: num($('cashIn').value),
     subtotal: items.reduce((s, it) => s + it.qty * it.rate, 0)
   };
 }
@@ -345,6 +372,15 @@ function buildPdf(d) {
     text('TOTAL', M, y + 0.5);
     text(pdfMoney(total), W - M, y + 0.5, { align: 'right' });
     y += 5;
+    if (d.cash > 0) {
+      font('normal', 8);
+      text('Cash', M, y);
+      text(pdfMoney(d.cash), W - M, y, { align: 'right' });
+      y += 3.6;
+      text('Change', M, y);
+      text(pdfMoney(d.cash - total), W - M, y, { align: 'right' });
+      y += 3.6;
+    }
     dash();
 
     font('normal', 7.5);
@@ -375,9 +411,9 @@ function esc(s) {
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
-function showReview() {
-  if (!items.length) { setStatus('Add at least one item first.', 'err'); return; }
-  const d = invoiceData();
+function showReview(d) {
+  if (!d.items.length) { setStatus('Add at least one item first.', 'err'); return; }
+  previewData = d;
   const total = Math.max(0, d.subtotal - d.discount);
 
   let h = '<div class="r-shop">' + esc(d.shopName) + '</div>';
@@ -400,6 +436,10 @@ function showReview() {
     h += '<div class="r-row"><span>Discount</span><span>- ' + esc(money(d.discount)) + '</span></div>';
   }
   h += '<div class="r-row r-total"><span>TOTAL</span><span>' + esc(money(total)) + '</span></div>';
+  if (d.cash > 0) {
+    h += '<div class="r-row"><span>Cash</span><span>' + esc(money(d.cash)) + '</span></div>';
+    h += '<div class="r-row"><span>Change</span><span>' + esc(money(d.cash - total)) + '</span></div>';
+  }
   h += '<div class="r-dash"></div><div class="r-thanks">Thank you! Visit again.</div>';
 
   $('receiptPreview').innerHTML = h;
@@ -410,51 +450,56 @@ function hideReview() {
   $('reviewModal').classList.add('hidden');
 }
 
-function openPdf() {
-  if (!items.length) { setStatus('Add at least one item first.', 'err'); return; }
-  const { blob } = buildPdf(invoiceData());
+function openPdf(d) {
+  if (!d.items.length) { setStatus('Add at least one item first.', 'err'); return; }
+  const { blob } = buildPdf(d);
   window.open(URL.createObjectURL(blob), '_blank');
 }
 
 /* ---------- share / download ---------- */
 
-async function sharePdf() {
-  if (!items.length) { setStatus('Add at least one item first.', 'err'); return; }
-  const { blob, fileName } = buildPdf(invoiceData());
+// Web Share API when available (mobile share sheet → WhatsApp etc.);
+// otherwise download the file and open WhatsApp so it can be attached.
+// Returns 'shared' | 'downloaded' | 'abort'.
+async function shareFile(blob, fileName, shareText, waPhone) {
   const file = new File([blob], fileName, { type: 'application/pdf' });
-  const total = $('grandTotal').textContent;
-
   if (navigator.canShare && navigator.canShare({ files: [file] })) {
     try {
-      await navigator.share({
-        files: [file],
-        title: 'Invoice ' + fileName,
-        text: 'Invoice ' + $('invoiceNo').value + ' — Total ' + total
-      });
-      setStatus('Invoice shared.', 'ok');
-      return;
+      await navigator.share({ files: [file], title: fileName, text: shareText });
+      return 'shared';
     } catch (e) {
-      if (e.name === 'AbortError') return; // user cancelled the share sheet
+      if (e.name === 'AbortError') return 'abort';
     }
   }
-  // fallback (no Web Share / insecure context):
-  // download the PDF, then open WhatsApp — to the customer's chat if their
-  // number is set, otherwise to the contact picker — so they can attach it.
-  downloadPdf();
-  const phone = $('custPhone').value.replace(/\D/g, '');
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
   const text = encodeURIComponent(
-    'Invoice ' + $('invoiceNo').value + ' — Total ' + total +
-    '\n(PDF downloaded — attach it to this chat to send it.)'
+    shareText + '\n(PDF downloaded — attach it to this chat to send it.)'
   );
-  const url = phone ? 'https://wa.me/' + phone + '?text=' + text
-                    : 'https://wa.me/?text=' + text;
-  window.open(url, '_blank');
-  setStatus('PDF downloaded. Attach it in the WhatsApp chat that opened.', 'ok');
+  window.open(waPhone ? 'https://wa.me/' + waPhone + '?text=' + text
+                      : 'https://wa.me/?text=' + text, '_blank');
+  return 'downloaded';
 }
 
-function downloadPdf() {
-  if (!items.length) { setStatus('Add at least one item first.', 'err'); return; }
-  const { blob, fileName } = buildPdf(invoiceData());
+async function sharePdf(d) {
+  if (!d.items.length) { setStatus('Add at least one item first.', 'err'); return; }
+  const { blob, fileName } = buildPdf(d);
+  const total = money(Math.max(0, d.subtotal - d.discount));
+  const res = await shareFile(blob, fileName, 'Invoice ' + d.no + ' — Total ' + total,
+    (d.custPhone || '').replace(/\D/g, ''));
+  if (res === 'shared') setStatus('Invoice shared.', 'ok');
+  else if (res === 'downloaded') setStatus('PDF downloaded. Attach it in the WhatsApp chat that opened.', 'ok');
+}
+
+function downloadPdf(d) {
+  if (!d.items.length) { setStatus('Add at least one item first.', 'err'); return; }
+  const { blob, fileName } = buildPdf(d);
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -480,11 +525,17 @@ function archiveCurrent() {
     iso: todayIso(),
     time: new Date().toTimeString().slice(0, 5),
     cust: d.custName,
+    phone: d.custPhone,
     items: items.map(it => ({ name: it.name, qty: it.qty, unit: it.unit, rate: it.rate })),
     subtotal: d.subtotal,
     discount: d.discount,
+    cash: d.cash,
     total: Math.max(0, d.subtotal - d.discount)
   });
+  items.forEach(it => {
+    vegRates[it.name.trim().toLowerCase()] = { rate: it.rate, unit: it.unit };
+  });
+  localStorage.setItem(LS.rates, JSON.stringify(vegRates));
   billRecorded = true;
   saveSales();
   renderToday();
@@ -498,7 +549,7 @@ function confirmBill() {
     archiveCurrent();
     setStatus('Bill #' + $('invoiceNo').value + ' saved to today\'s sales.', 'ok');
   }
-  showReview();
+  showReview(invoiceData());
 }
 
 function todayItemSummary() {
@@ -529,6 +580,55 @@ function renderToday() {
     row.append(n, q, a);
     list.appendChild(row);
   });
+
+  const bl = $('billsToday');
+  bl.innerHTML = '';
+  t.slice().reverse().forEach(b => { // newest first
+    const row = document.createElement('div');
+    row.className = 'bill-row';
+    const n = document.createElement('span');
+    n.textContent = '#' + b.no + (b.cust ? ' · ' + b.cust : '');
+    const tm = document.createElement('span');
+    tm.className = 't';
+    tm.textContent = b.time;
+    const a = document.createElement('span');
+    a.className = 'a';
+    a.textContent = money(b.total);
+    const rm = document.createElement('button');
+    rm.className = 'remove-btn';
+    rm.type = 'button';
+    rm.textContent = '×';
+    rm.title = 'Delete bill #' + b.no;
+    rm.addEventListener('click', e => { e.stopPropagation(); deleteBill(b); });
+    row.addEventListener('click', () => showReview(saleToInvoiceData(b)));
+    row.append(n, tm, a, rm);
+    bl.appendChild(row);
+  });
+}
+
+// rebuild invoice-shaped data from a saved sale so it can be previewed/shared
+function saleToInvoiceData(b) {
+  return {
+    shopName: settings.shopName || 'Vegetable Shop',
+    shopAddress: settings.shopAddress,
+    shopPhone: settings.shopPhone,
+    no: b.no,
+    date: fmtDate(b.iso),
+    custName: b.cust || '',
+    custPhone: b.phone || '',
+    items: b.items,
+    discount: b.discount || 0,
+    cash: b.cash || 0,
+    subtotal: b.subtotal
+  };
+}
+
+function deleteBill(b) {
+  if (!confirm('Delete bill #' + b.no + ' from today\'s sales?')) return;
+  sales = sales.filter(s => s !== b);
+  saveSales();
+  renderToday();
+  setStatus('Bill #' + b.no + ' deleted.', 'ok');
 }
 
 function clearToday() {
@@ -607,22 +707,13 @@ function buildDayReportPdf() {
   return { doc, fileName: 'day-report-' + todayIso() + '.pdf', bills: bills.length };
 }
 
-function dayReport() {
+async function dayReport() {
   const { doc, fileName, bills } = buildDayReportPdf();
   if (!bills) { setStatus('No sales recorded today yet.', 'err'); return; }
-  downloadDoc(doc, fileName);
-  setStatus('Day report downloaded.', 'ok');
-}
-
-function downloadDoc(doc, fileName) {
-  const url = URL.createObjectURL(doc.output('blob'));
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = fileName;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 5000);
+  const res = await shareFile(doc.output('blob'), fileName,
+    'Day report ' + fmtDate(todayIso()) + ' — ' + bills + ' bills', '');
+  if (res === 'shared') setStatus('Day report shared.', 'ok');
+  else if (res === 'downloaded') setStatus('Day report downloaded. Attach it in WhatsApp.', 'ok');
 }
 
 function buildStockReportPdf() {
@@ -683,11 +774,13 @@ function buildStockReportPdf() {
   return { doc, fileName: 'stock-summary-' + todayIso() + '.pdf', items: summary.length };
 }
 
-function stockReport() {
+async function stockReport() {
   const { doc, fileName, items } = buildStockReportPdf();
   if (!items) { setStatus('No sales recorded today yet.', 'err'); return; }
-  downloadDoc(doc, fileName);
-  setStatus('Stock summary downloaded.', 'ok');
+  const res = await shareFile(doc.output('blob'), fileName,
+    'Stock sold summary ' + fmtDate(todayIso()) + ' — ' + items + ' items', '');
+  if (res === 'shared') setStatus('Stock summary shared.', 'ok');
+  else if (res === 'downloaded') setStatus('Stock summary downloaded. Attach it in WhatsApp.', 'ok');
 }
 
 function newInvoice() {
@@ -697,6 +790,7 @@ function newInvoice() {
   $('custName').value = '';
   $('custPhone').value = '';
   $('discount').value = '';
+  $('cashIn').value = '';
   invoiceCounter += 1;
   localStorage.setItem(LS.counter, String(invoiceCounter));
   $('invoiceNo').value = String(invoiceCounter);
@@ -729,26 +823,27 @@ function init() {
   });
 
   $('addItemBtn').addEventListener('click', addItem);
+  $('itemName').addEventListener('change', () => prefillRate($('itemName').value));
   [$('itemName'), $('itemQty'), $('itemRate')].forEach(el =>
     el.addEventListener('keydown', e => { if (e.key === 'Enter') addItem(); }));
 
   $('addVegBtn').addEventListener('click', addVeg);
   $('newVeg').addEventListener('keydown', e => { if (e.key === 'Enter') addVeg(); });
 
-  ['custName', 'custPhone', 'discount'].forEach(id =>
+  ['custName', 'custPhone', 'discount', 'cashIn'].forEach(id =>
     $(id).addEventListener('input', () => { renderTotals(); saveAll(); }));
 
   $('saveBillBtn').addEventListener('click', confirmBill);
-  $('shareBtn').addEventListener('click', sharePdf);
-  $('downloadBtn').addEventListener('click', downloadPdf);
+  $('shareBtn').addEventListener('click', () => sharePdf(invoiceData()));
+  $('downloadBtn').addEventListener('click', () => downloadPdf(invoiceData()));
   $('newBtn').addEventListener('click', newInvoice);
 
-  $('reviewBtn').addEventListener('click', showReview);
+  $('reviewBtn').addEventListener('click', () => showReview(invoiceData()));
   $('reviewClose').addEventListener('click', hideReview);
   $('reviewModal').addEventListener('click', e => { if (e.target === $('reviewModal')) hideReview(); });
-  $('reviewShare').addEventListener('click', sharePdf);
-  $('reviewDownload').addEventListener('click', downloadPdf);
-  $('reviewOpenPdf').addEventListener('click', openPdf);
+  $('reviewShare').addEventListener('click', () => sharePdf(previewData || invoiceData()));
+  $('reviewDownload').addEventListener('click', () => downloadPdf(previewData || invoiceData()));
+  $('reviewOpenPdf').addEventListener('click', () => openPdf(previewData || invoiceData()));
   $('dayReportBtn').addEventListener('click', dayReport);
   $('stockReportBtn').addEventListener('click', stockReport);
   $('clearDayBtn').addEventListener('click', clearToday);
