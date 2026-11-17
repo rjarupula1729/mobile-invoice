@@ -1,6 +1,7 @@
 'use strict';
 
 const APP_VERSION = 'v1.0';
+const LICENSE_ENABLED = true; // flip to false + push to disable the activation lock
 
 const $ = (id) => document.getElementById(id);
 
@@ -14,7 +15,8 @@ const VEGETABLES = [
 
 const LS = {
   settings: 'ci_settings', draft: 'ci_draft', counter: 'ci_counter',
-  customVeg: 'ci_custom_veg', sales: 'ci_sales', rates: 'ci_rates'
+  customVeg: 'ci_custom_veg', sales: 'ci_sales', rates: 'ci_rates',
+  license: 'ci_license'
 };
 
 let settings = { shopName: '', shopAddress: '', shopPhone: '', currency: 'Rs' };
@@ -787,9 +789,42 @@ function newInvoice() {
   setStatus('New invoice #' + invoiceCounter, 'ok');
 }
 
+/* ---------- activation ---------- */
+
+async function sha256hex(s) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function activate() {
+  const key = $('licenseKey').value.trim().toUpperCase().replace(/\s+/g, '');
+  const msg = $('lockMsg');
+  if (!key) { msg.textContent = 'Enter your access key.'; return; }
+  msg.textContent = 'Checking...';
+  try {
+    const res = await fetch('keys.json', { cache: 'no-store' });
+    const data = await res.json();
+    const h = await sha256hex(key);
+    if ((data.keys || []).includes(h)) {
+      localStorage.setItem(LS.license, 'ok');
+      init();
+    } else {
+      msg.textContent = 'Invalid key. Check and try again.';
+    }
+  } catch (e) {
+    msg.textContent = 'Could not verify — connect to the internet once to activate.';
+  }
+}
+
 /* ---------- init ---------- */
 
 function init() {
+  if (LICENSE_ENABLED && localStorage.getItem(LS.license) !== 'ok') {
+    $('activateBtn').addEventListener('click', activate);
+    $('licenseKey').addEventListener('keydown', e => { if (e.key === 'Enter') activate(); });
+    return; // stay on lock screen until activated
+  }
+  $('lockScreen').classList.add('hidden');
   $('appVer').textContent = APP_VERSION;
   loadAll();
   renderSettings();

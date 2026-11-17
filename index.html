@@ -169,6 +169,17 @@
     </div>
   </div>
 
+  <!-- Activation lock -->
+  <div id="lockScreen" class="lock-screen">
+    <div class="lock-card">
+      <div class="lock-app">🥬 Mobile Invoice</div>
+      <div class="lock-sub">Enter access key to activate</div>
+      <input id="licenseKey" type="text" placeholder="VEG-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false">
+      <button id="activateBtn" class="btn btn-primary btn-full" type="button">Activate</button>
+      <p id="lockMsg" class="status muted center"></p>
+    </div>
+  </div>
+
   <script src="jspdf.umd.min.js"></script>
   <script src="app.js"></script>
 </body>
