@@ -377,7 +377,7 @@ function buildPdf(d) {
       text('Cash', M, y);
       text(pdfMoney(d.cash), W - M, y, { align: 'right' });
       y += 3.6;
-      text('Change', M, y);
+      text('Balance', M, y);
       text(pdfMoney(d.cash - total), W - M, y, { align: 'right' });
       y += 3.6;
     }
@@ -438,7 +438,7 @@ function showReview(d) {
   h += '<div class="r-row r-total"><span>TOTAL</span><span>' + esc(money(total)) + '</span></div>';
   if (d.cash > 0) {
     h += '<div class="r-row"><span>Cash</span><span>' + esc(money(d.cash)) + '</span></div>';
-    h += '<div class="r-row"><span>Change</span><span>' + esc(money(d.cash - total)) + '</span></div>';
+    h += '<div class="r-row"><span>Balance</span><span>' + esc(money(d.cash - total)) + '</span></div>';
   }
   h += '<div class="r-dash"></div><div class="r-thanks">Thank you! Visit again.</div>';
 

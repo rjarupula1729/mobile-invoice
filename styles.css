@@ -1,7 +1,7 @@
 :root {
   --green: #1b7a3d;
   --green-dark: #14592d;
-  --whatsapp: #25d366;
+  --share: #1976d2;
   --bg: #f2f5f3;
   --card: #ffffff;
   --text: #1d2a22;
@@ -18,7 +18,9 @@ html, body {
   background: var(--bg);
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  font-size: 15px;
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 .app-header {
@@ -94,13 +96,14 @@ label {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--muted);
 }
 
 input, select {
   font: inherit;
+  font-size: 16px; /* >=16px stops iOS auto-zooming on input focus */
   color: var(--text);
   padding: 10px 10px;
   border: 1px solid var(--border);
@@ -116,7 +119,7 @@ input:focus, select:focus {
 }
 
 .section-title {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .04em;
@@ -136,8 +139,8 @@ input:focus, select:focus {
   color: var(--green-dark);
   background: #eef7f0;
   border-radius: 999px;
-  padding: 6px 12px;
-  font-size: 13px;
+  padding: 7px 13px;
+  font-size: 14px;
   cursor: pointer;
 }
 
@@ -180,7 +183,7 @@ input:focus, select:focus {
 
 .item-row .name { font-weight: 600; overflow-wrap: anywhere; }
 
-.item-row input { padding: 6px 6px; font-size: 13px; text-align: right; }
+.item-row input { padding: 6px 6px; font-size: 14px; text-align: right; }
 
 .item-row .unit-tag {
   font-size: 11px;
@@ -234,8 +237,8 @@ input:focus, select:focus {
 .actions .btn {
   flex: 1 1 auto;
   width: auto;
-  padding: 10px 8px;
-  font-size: 13px;
+  padding: 11px 8px;
+  font-size: 14px;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -254,14 +257,15 @@ input:focus, select:focus {
 
 .btn-primary { background: var(--green); color: #fff; padding: 10px 16px; font-size: 14px; width: auto; }
 .btn-full { width: 100%; padding: 14px; font-size: 16px; }
-.btn-whatsapp { background: var(--whatsapp); color: #fff; }
+.btn-share { background: var(--share); color: #fff; }
 .btn-secondary { background: #fff; color: var(--green-dark); border: 1px solid var(--green); }
 .btn-ghost { background: none; color: var(--muted); font-weight: 600; }
+.btn-danger-ghost { background: none; color: var(--danger); font-weight: 600; }
 
 .muted { color: var(--muted); }
 .small { font-size: 12px; margin: 0; }
 .center { text-align: center; }
-.status { min-height: 18px; margin: 0; font-size: 13px; }
+.status { min-height: 18px; margin: 0; font-size: 14px; }
 .status.ok { color: var(--green-dark); }
 .status.err { color: var(--danger); }
 
@@ -296,7 +300,7 @@ input:focus, select:focus {
   grid-template-columns: 1fr auto auto;
   gap: 10px;
   padding: 3px 0;
-  font-size: 13px;
+  font-size: 14px;
   border-bottom: 1px dashed var(--border);
 }
 
@@ -319,7 +323,7 @@ input:focus, select:focus {
   gap: 8px;
   align-items: center;
   padding: 5px 0;
-  font-size: 13px;
+  font-size: 14px;
   border-bottom: 1px dashed var(--border);
   cursor: pointer;
 }

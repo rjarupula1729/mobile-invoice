@@ -112,7 +112,7 @@
             <span>Cash received</span>
             <input id="cashIn" type="number" inputmode="decimal" min="0" step="any" placeholder="0">
           </div>
-          <div class="totals-row hidden" id="changeRow"><span>Change</span><span id="changeAmt">0.00</span></div>
+          <div class="totals-row hidden" id="changeRow"><span>Balance</span><span id="changeAmt">0.00</span></div>
         </div>
       </div>
     </section>
@@ -130,7 +130,7 @@
         <div class="btn-row">
           <button id="stockReportBtn" class="btn btn-secondary btn-sm" type="button">Stock summary</button>
           <button id="dayReportBtn" class="btn btn-secondary btn-sm" type="button">Day report</button>
-          <button id="clearDayBtn" class="btn btn-ghost btn-sm" type="button">Clear</button>
+          <button id="clearDayBtn" class="btn btn-danger-ghost btn-sm" type="button">Clear</button>
         </div>
       </div>
     </section>
@@ -139,9 +139,9 @@
     <section class="actions">
       <button id="saveBillBtn" class="btn btn-primary btn-full" type="button">Billing</button>
       <button id="reviewBtn" class="btn btn-secondary" type="button">Review</button>
-      <button id="shareBtn" class="btn btn-whatsapp" type="button">Share</button>
+      <button id="shareBtn" class="btn btn-share" type="button">Share</button>
       <button id="downloadBtn" class="btn btn-secondary" type="button">Download</button>
-      <button id="newBtn" class="btn btn-ghost" type="button">New Invoice</button>
+      <button id="newBtn" class="btn btn-primary" type="button">New Invoice</button>
     </section>
 
     <p id="statusMsg" class="status muted center" role="status"></p>
@@ -158,7 +158,7 @@
         <div id="receiptPreview" class="receipt"></div>
       </div>
       <div class="review-actions">
-        <button id="reviewShare" class="btn btn-whatsapp icon-btn" type="button" title="Share" aria-label="Share">
+        <button id="reviewShare" class="btn btn-share icon-btn" type="button" title="Share" aria-label="Share">
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
         </button>
         <button id="reviewDownload" class="btn btn-secondary icon-btn" type="button" title="Download PDF" aria-label="Download PDF">
