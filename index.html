@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Compact Invoice — Vegetable Billing</title>
+  <meta name="theme-color" content="#1b7a3d">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="app-header">
+    <h1>🥬 Compact Invoice <span id="appVer" class="ver"></span></h1>
+  </header>
+
+  <main class="container">
+
+    <!-- Shop settings -->
+    <details class="card" id="settingsCard">
+      <summary>Shop details <span id="settingsSummary" class="muted"></span></summary>
+      <div class="card-body">
+        <label>Shop name
+          <input id="shopName" type="text" placeholder="e.g. Fresh Veggies" autocomplete="organization">
+        </label>
+        <label>Address / market line
+          <input id="shopAddress" type="text" placeholder="e.g. Stall 12, Vegetable Market">
+        </label>
+        <label>Shop phone
+          <input id="shopPhone" type="tel" placeholder="e.g. 98765 43210">
+        </label>
+        <label>Currency symbol
+          <input id="currency" type="text" maxlength="3" placeholder="Rs">
+        </label>
+        <p class="muted small">Saved on this device automatically.</p>
+      </div>
+    </details>
+
+    <!-- Invoice meta -->
+    <section class="card">
+      <div class="card-body grid-2">
+        <label>Invoice no.
+          <input id="invoiceNo" type="text" inputmode="numeric">
+        </label>
+        <label>Date
+          <input id="invoiceDate" type="date">
+        </label>
+        <label>Customer name (optional)
+          <input id="custName" type="text" placeholder="Walk-in customer" autocomplete="off">
+        </label>
+        <label>Customer WhatsApp no. (optional)
+          <input id="custPhone" type="tel" inputmode="tel" placeholder="e.g. 919876543210">
+        </label>
+      </div>
+    </section>
+
+    <!-- Quick items -->
+    <section class="card">
+      <div class="card-body">
+        <div class="section-title">Quick pick</div>
+        <div id="quickItems" class="chips"></div>
+        <div class="add-veg-row">
+          <input id="newVeg" type="text" placeholder="Add missing vegetable…" autocomplete="off">
+          <button id="addVegBtn" class="btn btn-primary" type="button">Add</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Add item -->
+    <section class="card">
+      <div class="card-body">
+        <div class="section-title">Add item</div>
+        <div class="item-form">
+          <input id="itemName" type="text" list="vegList" placeholder="Item name" autocomplete="off">
+          <datalist id="vegList"></datalist>
+          <div class="item-form-row">
+            <input id="itemQty" type="number" inputmode="decimal" min="0" step="any" placeholder="Qty">
+            <select id="itemUnit">
+              <option value="kg">kg</option>
+              <option value="g">g</option>
+              <option value="pcs">pcs</option>
+              <option value="dozen">dozen</option>
+              <option value="bunch">bunch</option>
+              <option value="litre">litre</option>
+            </select>
+            <input id="itemRate" type="number" inputmode="decimal" min="0" step="any" placeholder="Rate / unit">
+            <button id="addItemBtn" class="btn btn-primary" type="button">Add</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Items list -->
+    <section class="card">
+      <div class="card-body">
+        <div class="section-title">Bill items <span id="itemCount" class="muted"></span></div>
+        <div id="itemsList" class="items-list"></div>
+        <div id="emptyMsg" class="muted center">No items yet — add vegetables above.</div>
+
+        <div class="totals">
+          <div class="totals-row"><span>Subtotal</span><span id="subtotal">0.00</span></div>
+          <div class="totals-row">
+            <span>Discount</span>
+            <input id="discount" type="number" inputmode="decimal" min="0" step="any" placeholder="0">
+          </div>
+          <div class="totals-row grand"><span>Total</span><span id="grandTotal">0.00</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Today's sales -->
+    <section class="card">
+      <div class="card-body">
+        <div class="section-title">Today's sales</div>
+        <div class="totals-row" style="border:none;padding:0">
+          <span id="todayCount">0 bills</span>
+          <span id="todayTotal" class="grand" style="font-size:16px;font-weight:700"></span>
+        </div>
+        <button id="dayReportBtn" class="btn btn-secondary" type="button">Download day report (PDF)</button>
+        <button id="clearDayBtn" class="btn btn-ghost" type="button">Clear today's records</button>
+      </div>
+    </section>
+
+    <!-- Actions -->
+    <section class="actions">
+      <button id="saveBillBtn" class="btn btn-primary btn-full" type="button">Save bill</button>
+      <button id="reviewBtn" class="btn btn-secondary" type="button">Review invoice</button>
+      <button id="shareBtn" class="btn btn-whatsapp" type="button">Share PDF on WhatsApp</button>
+      <button id="downloadBtn" class="btn btn-secondary" type="button">Download PDF</button>
+      <button id="newBtn" class="btn btn-ghost" type="button">New invoice</button>
+    </section>
+
+    <p id="statusMsg" class="status muted center" role="status"></p>
+  </main>
+
+  <!-- Review overlay -->
+  <div id="reviewModal" class="review-modal hidden">
+    <div class="review-sheet">
+      <div class="review-head">
+        <span class="review-title">Invoice preview</span>
+        <button id="reviewClose" class="review-close" type="button" aria-label="Close">×</button>
+      </div>
+      <div class="review-body">
+        <div id="receiptPreview" class="receipt"></div>
+      </div>
+      <div class="review-actions">
+        <button id="reviewShare" class="btn btn-whatsapp" type="button">Share on WhatsApp</button>
+        <button id="reviewDownload" class="btn btn-secondary" type="button">Download PDF</button>
+        <button id="reviewOpenPdf" class="btn btn-ghost" type="button">Open PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="jspdf.umd.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "Compact Invoice — Vegetable Billing",
+  "short_name": "VegBill",
+  "description": "Create vegetable sale invoices and share them as PDF on WhatsApp.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f2f5f3",
+  "theme_color": "#1b7a3d",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
