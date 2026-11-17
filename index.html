@@ -52,7 +52,7 @@
         <label>Customer name (optional)
           <input id="custName" type="text" placeholder="Walk-in customer" autocomplete="off">
         </label>
-        <label>Customer WhatsApp no. (optional)
+        <label>Customer No (optional)
           <input id="custPhone" type="tel" inputmode="tel" placeholder="e.g. 919876543210">
         </label>
       </div>
@@ -65,7 +65,7 @@
         <div id="quickItems" class="chips"></div>
         <div class="add-veg-row">
           <input id="newVeg" type="text" placeholder="Add missing vegetable…" autocomplete="off">
-          <button id="addVegBtn" class="btn btn-primary" type="button">Add</button>
+          <button id="addVegBtn" class="btn btn-primary btn-add" type="button">Add</button>
         </div>
       </div>
     </section>
@@ -88,7 +88,7 @@
               <option value="litre">litre</option>
             </select>
             <input id="itemRate" type="number" inputmode="decimal" min="0" step="any" placeholder="Rate / unit">
-            <button id="addItemBtn" class="btn btn-primary" type="button">Add</button>
+            <button id="addItemBtn" class="btn btn-primary btn-add" type="button">Add</button>
           </div>
         </div>
       </div>
@@ -125,8 +125,11 @@
           <span id="todayCount">0 bills</span>
           <span id="todayTotal" class="grand" style="font-size:16px;font-weight:700"></span>
         </div>
-        <div id="soldToday" class="sold-list"></div>
-        <div id="billsToday" class="bills-list"></div>
+        <details class="sales-details">
+          <summary>Items &amp; bills</summary>
+          <div id="soldToday" class="sold-list"></div>
+          <div id="billsToday" class="bills-list"></div>
+        </details>
         <div class="btn-row">
           <button id="stockReportBtn" class="btn btn-secondary btn-sm" type="button">Stock summary</button>
           <button id="dayReportBtn" class="btn btn-secondary btn-sm" type="button">Day Sales</button>
