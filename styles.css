@@ -127,6 +127,18 @@ input, select {
   min-width: 0;
 }
 
+/* hide number input spinners — they look like dropdown buttons */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
 input:focus, select:focus {
   outline: 2px solid var(--green);
   outline-offset: -1px;
@@ -192,6 +204,7 @@ input:focus, select:focus {
 .item-form-row #itemQty { width: 50px; }
 .item-form-row #itemUnit { width: 58px; }
 .item-form-row #itemRate { width: 60px; }
+
 
 .items-list { display: flex; flex-direction: column; }
 

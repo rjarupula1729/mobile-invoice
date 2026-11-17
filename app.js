@@ -202,12 +202,18 @@ function renderTotals() {
 /* ---------- item entry ---------- */
 
 function addItem() {
-  const name = $('itemName').value.trim();
+  const name = $('itemName').value.trim().replace(/\s+/g, ' ');
   const qty = num($('itemQty').value);
   const rate = num($('itemRate').value);
   if (!name) { setStatus('Enter an item name.', 'err'); $('itemName').focus(); return; }
   if (qty <= 0) { setStatus('Enter a quantity.', 'err'); $('itemQty').focus(); return; }
   items.push({ name, qty, unit: $('itemUnit').value, rate });
+  // auto-add new items to quick pick so they become one-tap chips
+  if (!allVeg().some(v => v.toLowerCase() === name.toLowerCase())) {
+    customVeg.push(name);
+    localStorage.setItem(LS.customVeg, JSON.stringify(customVeg));
+    buildQuickItems();
+  }
   $('itemName').value = ''; $('itemQty').value = ''; $('itemRate').value = '';
   $('itemName').focus();
   renderItems(); renderTotals(); saveAll();
@@ -228,9 +234,7 @@ function prefillRate(name) {
 
 function buildQuickItems() {
   const wrap = $('quickItems');
-  const dl = $('vegList');
   wrap.innerHTML = '';
-  dl.innerHTML = '';
   allVeg().forEach(v => {
     const chip = document.createElement('button');
     chip.type = 'button';
@@ -256,9 +260,6 @@ function buildQuickItems() {
       chip.appendChild(x);
     }
     wrap.appendChild(chip);
-    const opt = document.createElement('option');
-    opt.value = v;
-    dl.appendChild(opt);
   });
 }
 
