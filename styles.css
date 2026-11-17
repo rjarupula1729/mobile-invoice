@@ -226,8 +226,18 @@ input:focus, select:focus {
 
 .actions {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.actions .btn {
+  flex: 1 1 auto;
+  width: auto;
+  padding: 10px 8px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .btn {
@@ -256,6 +266,43 @@ input:focus, select:focus {
 .status.err { color: var(--danger); }
 
 .hidden { display: none !important; }
+
+/* ---------- compact button row ---------- */
+
+.btn-row {
+  display: flex;
+  gap: 6px;
+}
+
+.btn-sm {
+  flex: 1;
+  padding: 9px 4px;
+  font-size: 13px;
+  font-weight: 600;
+  width: auto;
+}
+
+/* ---------- sold-today mini list ---------- */
+
+.sold-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 132px;
+  overflow-y: auto;
+}
+
+.sold-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 10px;
+  padding: 3px 0;
+  font-size: 13px;
+  border-bottom: 1px dashed var(--border);
+}
+
+.sold-row:last-child { border-bottom: none; }
+.sold-row .q { color: var(--muted); }
+.sold-row .a { font-weight: 600; }
 
 /* ---------- review modal ---------- */
 
@@ -308,8 +355,17 @@ input:focus, select:focus {
 .review-actions {
   padding: 12px 14px calc(14px + env(safe-area-inset-bottom));
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.review-actions .btn {
+  flex: 1 1 auto;
+  width: auto;
+  padding: 10px 8px;
+  font-size: 13px;
+  white-space: nowrap;
 }
 
 /* receipt look — mirrors the PDF layout */

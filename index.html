@@ -120,18 +120,22 @@
           <span id="todayCount">0 bills</span>
           <span id="todayTotal" class="grand" style="font-size:16px;font-weight:700"></span>
         </div>
-        <button id="dayReportBtn" class="btn btn-secondary" type="button">Download day report (PDF)</button>
-        <button id="clearDayBtn" class="btn btn-ghost" type="button">Clear today's records</button>
+        <div id="soldToday" class="sold-list"></div>
+        <div class="btn-row">
+          <button id="stockReportBtn" class="btn btn-secondary btn-sm" type="button">Stock summary</button>
+          <button id="dayReportBtn" class="btn btn-secondary btn-sm" type="button">Day report</button>
+          <button id="clearDayBtn" class="btn btn-ghost btn-sm" type="button">Clear</button>
+        </div>
       </div>
     </section>
 
     <!-- Actions -->
     <section class="actions">
-      <button id="saveBillBtn" class="btn btn-primary btn-full" type="button">Save bill</button>
-      <button id="reviewBtn" class="btn btn-secondary" type="button">Review invoice</button>
-      <button id="shareBtn" class="btn btn-whatsapp" type="button">Share PDF on WhatsApp</button>
-      <button id="downloadBtn" class="btn btn-secondary" type="button">Download PDF</button>
-      <button id="newBtn" class="btn btn-ghost" type="button">New invoice</button>
+      <button id="saveBillBtn" class="btn btn-primary btn-full" type="button">Billing</button>
+      <button id="reviewBtn" class="btn btn-secondary" type="button">Review</button>
+      <button id="shareBtn" class="btn btn-whatsapp" type="button">WhatsApp</button>
+      <button id="downloadBtn" class="btn btn-secondary" type="button">Download</button>
+      <button id="newBtn" class="btn btn-ghost" type="button">New</button>
     </section>
 
     <p id="statusMsg" class="status muted center" role="status"></p>
@@ -148,8 +152,8 @@
         <div id="receiptPreview" class="receipt"></div>
       </div>
       <div class="review-actions">
-        <button id="reviewShare" class="btn btn-whatsapp" type="button">Share on WhatsApp</button>
-        <button id="reviewDownload" class="btn btn-secondary" type="button">Download PDF</button>
+        <button id="reviewShare" class="btn btn-whatsapp" type="button">WhatsApp</button>
+        <button id="reviewDownload" class="btn btn-secondary" type="button">Download</button>
         <button id="reviewOpenPdf" class="btn btn-ghost" type="button">Open PDF</button>
       </div>
     </div>
