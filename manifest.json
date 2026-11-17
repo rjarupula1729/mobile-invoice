@@ -1,5 +1,5 @@
 {
-  "name": "Compact Invoice — Vegetable Billing",
+  "name": "Mobile Invoice — Vegetable Billing",
   "short_name": "VegBill",
   "description": "Create vegetable sale invoices and share them as PDF on WhatsApp.",
   "start_url": "./index.html",

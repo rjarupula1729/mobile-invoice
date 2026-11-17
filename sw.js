@@ -1,4 +1,4 @@
-const CACHE = 'compact-invoice-v13';
+const CACHE = 'mobile-invoice-v13';
 const ASSETS = [
   './',
   './index.html',
