@@ -497,20 +497,6 @@ async function sharePdf(d) {
   else if (res === 'downloaded') setStatus('PDF downloaded. Attach it in the WhatsApp chat that opened.', 'ok');
 }
 
-function downloadPdf(d) {
-  if (!d.items.length) { setStatus('Add at least one item first.', 'err'); return; }
-  const { blob, fileName } = buildPdf(d);
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = fileName;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 5000);
-  setStatus('PDF saved: ' + fileName, 'ok');
-}
-
 /* ---------- sales log ---------- */
 
 function saveSales() {
@@ -664,7 +650,7 @@ function buildDayReportPdf() {
       text(l, W / 2, y, { align: 'center' }); y += 4.5;
     });
     font('normal', 8);
-    text('DAY REPORT', W / 2, y, { align: 'center' }); y += 3.6;
+    text('DAY SALES', W / 2, y, { align: 'center' }); y += 3.6;
     text(fmtDate(todayIso()), W / 2, y, { align: 'center' }); y += 3.6;
     dash();
 
@@ -704,16 +690,16 @@ function buildDayReportPdf() {
     orientation: height > W ? 'portrait' : 'landscape'
   });
   layout(doc, true);
-  return { doc, fileName: 'day-report-' + todayIso() + '.pdf', bills: bills.length };
+  return { doc, fileName: 'day-sales-' + todayIso() + '.pdf', bills: bills.length };
 }
 
 async function dayReport() {
   const { doc, fileName, bills } = buildDayReportPdf();
   if (!bills) { setStatus('No sales recorded today yet.', 'err'); return; }
   const res = await shareFile(doc.output('blob'), fileName,
-    'Day report ' + fmtDate(todayIso()) + ' — ' + bills + ' bills', '');
-  if (res === 'shared') setStatus('Day report shared.', 'ok');
-  else if (res === 'downloaded') setStatus('Day report downloaded. Attach it in WhatsApp.', 'ok');
+    'Day sales ' + fmtDate(todayIso()) + ' — ' + bills + ' bills', '');
+  if (res === 'shared') setStatus('Day sales shared.', 'ok');
+  else if (res === 'downloaded') setStatus('Day sales downloaded. Attach it in WhatsApp.', 'ok');
 }
 
 function buildStockReportPdf() {
@@ -835,14 +821,12 @@ function init() {
 
   $('saveBillBtn').addEventListener('click', confirmBill);
   $('shareBtn').addEventListener('click', () => sharePdf(invoiceData()));
-  $('downloadBtn').addEventListener('click', () => downloadPdf(invoiceData()));
   $('newBtn').addEventListener('click', newInvoice);
 
   $('reviewBtn').addEventListener('click', () => showReview(invoiceData()));
   $('reviewClose').addEventListener('click', hideReview);
   $('reviewModal').addEventListener('click', e => { if (e.target === $('reviewModal')) hideReview(); });
   $('reviewShare').addEventListener('click', () => sharePdf(previewData || invoiceData()));
-  $('reviewDownload').addEventListener('click', () => downloadPdf(previewData || invoiceData()));
   $('reviewOpenPdf').addEventListener('click', () => openPdf(previewData || invoiceData()));
   $('dayReportBtn').addEventListener('click', dayReport);
   $('stockReportBtn').addEventListener('click', stockReport);
