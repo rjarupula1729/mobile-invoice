@@ -75,9 +75,9 @@
       <div class="card-body">
         <div class="section-title">Add item</div>
         <div class="item-form">
-          <input id="itemName" type="text" list="vegList" placeholder="Item name" autocomplete="off">
           <datalist id="vegList"></datalist>
           <div class="item-form-row">
+            <input id="itemName" type="text" list="vegList" placeholder="Item name" autocomplete="off">
             <input id="itemQty" type="number" inputmode="decimal" min="0" step="any" placeholder="Qty">
             <select id="itemUnit">
               <option value="kg">kg</option>
@@ -87,7 +87,7 @@
               <option value="bunch">bunch</option>
               <option value="litre">litre</option>
             </select>
-            <input id="itemRate" type="number" inputmode="decimal" min="0" step="any" placeholder="Rate / unit">
+            <input id="itemRate" type="number" inputmode="decimal" min="0" step="any" placeholder="Rate">
             <button id="addItemBtn" class="btn btn-primary btn-add" type="button">Add</button>
           </div>
         </div>

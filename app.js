@@ -139,6 +139,7 @@ function renderItems() {
       renderTotals(); saveAll();
     });
     const qtyWrap = document.createElement('div');
+    qtyWrap.className = 'qtycell';
     qtyWrap.appendChild(qty);
     const unitTag = document.createElement('span');
     unitTag.className = 'unit-tag';
@@ -146,6 +147,7 @@ function renderItems() {
     qtyWrap.appendChild(unitTag);
 
     const rate = document.createElement('input');
+    rate.className = 'ratecell';
     rate.type = 'number'; rate.min = '0'; rate.step = 'any';
     rate.value = it.rate;
     rate.title = 'Rate per ' + it.unit;

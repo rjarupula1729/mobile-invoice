@@ -63,9 +63,14 @@ html, body {
   overflow: hidden;
 }
 
+#settingsSummary {
+  font-weight: 700;
+  color: var(--green-dark);
+}
+
 .card summary {
   padding: 8px 10px;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   list-style: none;
 }
@@ -90,12 +95,12 @@ html, body {
 .grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 6px;
+  gap: 4px;
 }
 
-.grid-2 label { font-size: 12px; }
+.grid-2 label { font-size: 12px; gap: 2px; }
 
-.grid-2 input { padding: 6px 8px; font-size: 14px; }
+.grid-2 input { padding: 4px 8px; font-size: 12px; }
 
 #settingsCard label { font-size: 12px; }
 
@@ -167,29 +172,35 @@ input:focus, select:focus {
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 6px;
+  align-items: center;
 }
 
 .item-form { display: flex; flex-direction: column; gap: 6px; }
 
 .item-form input, .item-form select, .add-veg-row input {
-  padding: 6px 8px;
-  font-size: 14px;
+  padding: 4px 8px;
+  font-size: 12px;
 }
 
 .item-form-row {
   display: grid;
-  grid-template-columns: 1.2fr 1fr 1.4fr auto;
-  gap: 6px;
+  grid-template-columns: minmax(0, 1fr) auto auto auto auto;
+  gap: 5px;
+  align-items: center;
 }
+
+.item-form-row #itemQty { width: 50px; }
+.item-form-row #itemUnit { width: 58px; }
+.item-form-row #itemRate { width: 60px; }
 
 .items-list { display: flex; flex-direction: column; }
 
 .item-row {
   display: grid;
-  grid-template-columns: 1.6fr .8fr .9fr .9fr auto;
-  gap: 5px;
+  grid-template-columns: minmax(0, 1fr) auto auto auto auto;
+  gap: 6px;
   align-items: center;
-  padding: 4px 0;
+  padding: 2px 0;
   border-bottom: 1px dashed var(--border);
 }
 
@@ -197,16 +208,21 @@ input:focus, select:focus {
 
 .item-row .name { font-weight: 500; overflow-wrap: anywhere; }
 
-.item-row input { padding: 4px 5px; font-size: 13px; text-align: right; }
+.item-row .qtycell { display: flex; align-items: center; gap: 4px; }
 
-.item-row .unit-tag {
-  font-size: 10px;
-  color: var(--muted);
-  display: block;
-  text-align: right;
-}
+.item-row .qtycell input { flex: none; width: 54px; }
+
+.item-row .ratecell { width: 66px; }
 
 .item-row .amount { font-weight: 600; text-align: right; white-space: nowrap; }
+
+.item-row input { padding: 2px 4px; font-size: 12px; text-align: right; width: 100%; }
+
+.item-row .unit-tag {
+  font-size: 11px;
+  color: var(--muted);
+  flex: none;
+}
 
 .remove-btn {
   border: none;
@@ -218,13 +234,13 @@ input:focus, select:focus {
 }
 
 .totals {
-  margin-top: 6px;
+  margin-top: 4px;
   border-top: 1px solid var(--border);
-  padding-top: 6px;
+  padding-top: 4px;
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  font-size: 14px;
+  gap: 2px;
+  font-size: 13px;
 }
 
 .totals-row {
@@ -234,10 +250,10 @@ input:focus, select:focus {
   gap: 10px;
 }
 
-.totals-row input { width: 100px; text-align: right; padding: 5px 7px; font-size: 14px; }
+.totals-row input { width: 90px; text-align: right; padding: 2px 6px; font-size: 12px; }
 
 .totals-row.grand {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--green-dark);
 }
