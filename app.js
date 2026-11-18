@@ -1,7 +1,7 @@
 'use strict';
 
 const APP_VERSION = 'v1.0';
-const LICENSE_ENABLED = true; // flip to false + push to disable the activation lock
+const LICENSE_ENABLED = false; // flip to false + push to disable the activation lock
 
 const $ = (id) => document.getElementById(id);
 
